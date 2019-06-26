@@ -1,5 +1,4 @@
 const appRoot = require('app-root-path');
-const config = require('config');
 const _ = require('lodash');
 
 const { serializePets, serializePet } = require('../../serializers/pets-serializer');
@@ -7,18 +6,16 @@ const { serializePets, serializePet } = require('../../serializers/pets-serializ
 const conn = appRoot.require('api/v1/db/oracledb/connection');
 const { contrib } = appRoot.require('api/v1/db/oracledb/contrib/contrib');
 
-const { endpointUri } = config.get('server');
-
 /**
  * @summary Return a list of pets
  * @function
  * @returns {Promise<Object[]>} Promise object represents a list of pets
  */
-const getPets = async () => {
+const getPets = async (query) => {
   const connection = await conn.getConnection();
   try {
     const { rawPets } = await connection.execute(contrib.getPets());
-    const serializedPets = serializePets(rawPets, endpointUri);
+    const serializedPets = serializePets(rawPets, query);
     return serializedPets;
   } finally {
     connection.close();
